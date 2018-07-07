@@ -1,22 +1,33 @@
+import "babel-polyfill";
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
+import Loadable from "@7rulnik/react-loadable";
+import {
+  BrowserRouter as Router, Switch, Route,
+} from "react-router-dom";
+import TestContainer from "Containers/testPage";
+import Loading from "Components/test";
 import configureStore from "./store/index";
 
-import TestElem from "./containers/index";
+const LoadableComponent = Loadable({
+  loader: () => import("Components/test"),
+  loading: Loading,
+});
 
 const initialState = {};
 const store = configureStore(initialState);
 
-const Root = () => {
-  return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <TestElem />
-      </BrowserRouter>
-    </Provider>
-  );
-};
+const Root = () => (
+  <Provider store={store}>
+    <Router>
+      <Switch>
+        <Route exact path="/" component={Loading} />
+        <Route path="/about" component={LoadableComponent} />
+        <Route path="/test" component={TestContainer} />
+      </Switch>
+    </Router>
+  </Provider>
+);
 
 ReactDOM.render(<Root />, document.getElementById("root"));

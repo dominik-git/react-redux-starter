@@ -1,25 +1,57 @@
-const HtmlWebPackPlugin = require("html-webpack-plugin");
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const htmlWebpackPlugin = new HtmlWebPackPlugin({
-  template: "./src/index.html",
-  filename: "./index.html"
-});
 
 module.exports = {
+  entry: {
+    vendor: ["babel-polyfill", "react", "react-dom", "redux"],
+    main: "./src/index.js",
+  },
+  output: {
+    path: path.join(__dirname, "./build"),
+    filename: "[name].[chunkhash].bundle.js",
+    chunkFilename: "[name].[chunkhash].bundle.js",
+    publicPath: "/",
+  },
+  resolve: {
+    modules: [path.resolve(__dirname, "./src"), "node_modules"],
+    extensions: [".js", ".jsx", ".json"],
+    alias: {
+      Components: path.resolve(__dirname, "src/components"),
+      Containers: path.resolve(__dirname, "src/containers"),
+      Reducers: path.resolve(__dirname, "src/reducers"),
+      Actions: path.resolve(__dirname, "src/actions"),
+      Consts: path.resolve(__dirname, "src/consts"),
+    },
+  },
+  performance: { hints: false },
+  optimization: {
+    splitChunks: {
+      chunks: "initial",
+      cacheGroups: {
+        vendor: {
+          name: "vendor",
+          test: "vendor",
+          enforce: true,
+        },
+      },
+    },
+    runtimeChunk: true,
+  },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader"
-        }
+          loader: "babel-loader",
+        },
       },
       {
         test: /\.css$/,
         use: [
           {
-            loader: "style-loader"
+            loader: "style-loader",
           },
           {
             loader: "css-loader",
@@ -28,19 +60,36 @@ module.exports = {
               importLoaders: 1,
               localIdentName: "[name]_[local]_[hash:base64]",
               sourceMap: true,
-              minimize: true
-            }
+              minimize: true,
+            },
           },
-        ]
+        ],
+      },
+      {
+        test: /\.html$/,
+        use: [
+          {
+            loader: "html-loader",
+            options: { minimize: true },
+          },
+        ],
       },
       {
         test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
-        loader: 'url-loader',
+        loader: "url-loader",
         options: {
-          limit: 10000
-        }
-      }
-    ]
+          limit: 10000,
+        },
+      },
+    ],
   },
-  plugins: [htmlWebpackPlugin]
+  devServer: {
+    historyApiFallback: true,
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./src/index.html",
+    }),
+
+  ],
 };
