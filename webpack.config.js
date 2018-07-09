@@ -11,7 +11,6 @@ module.exports = {
     path: path.join(__dirname, "./build"),
     filename: "[name].[chunkhash].bundle.js",
     chunkFilename: "[name].[chunkhash].bundle.js",
-    publicPath: "/",
   },
   resolve: {
     modules: [path.resolve(__dirname, "./src"), "node_modules"],
